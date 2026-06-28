@@ -36,7 +36,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold">🎁 PremiumKits Panel</h1>
+            <h1 className="text-2xl font-bold">PremiumKits Panel</h1>
             <p className="text-gray-400 text-sm mt-0.5">Manage your Minecraft kit servers</p>
           </div>
           <button onClick={() => setShowCreate(true)}
