@@ -7,7 +7,7 @@ import Landing from './pages/Landing.jsx';
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem('pk_token');
-  if (!token) return <Navigate to="/login" replace />;
+  if (!token) return <Navigate to="/welcome" replace />;
   return children;
 }
 

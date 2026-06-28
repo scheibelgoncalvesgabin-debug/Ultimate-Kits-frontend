@@ -39,10 +39,20 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold">PremiumKits Panel</h1>
             <p className="text-gray-400 text-sm mt-0.5">Manage your Minecraft kit servers</p>
           </div>
-          <button onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-all">
-            <Plus className="w-4 h-4"/> Add Server
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-all">
+              <Plus className="w-4 h-4"/> Add Server
+            </button>
+            <button onClick={() => {
+                localStorage.removeItem('pk_token');
+                localStorage.removeItem('pk_refresh');
+                navigate('/welcome');
+              }}
+              className="px-4 py-2 bg-[#1e1e2e] hover:bg-[#2a2a3e] border border-[#373750] text-gray-400 hover:text-white rounded-lg text-sm transition-all">
+              Déconnexion
+            </button>
+          </div>
         </div>
 
         {/* Create modal */}
