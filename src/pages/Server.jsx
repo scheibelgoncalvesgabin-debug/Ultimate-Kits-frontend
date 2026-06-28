@@ -256,6 +256,26 @@ export default function Server() {
             </div>
 
             <TeamSection serverId={serverId}/>
+
+            {/* Danger zone */}
+            <div className="bg-[#1e1e2e] border border-red-900/50 rounded-xl p-5">
+              <h3 className="font-semibold text-red-400 mb-3">⚠️ Zone de danger</h3>
+              <p className="text-sm text-gray-400 mb-4">La suppression du serveur est irréversible. Tous les kits et données seront perdus.</p>
+              <button
+                onClick={async () => {
+                  if (!confirm(`Supprimer définitivement "${server?.name}" ? Cette action est irréversible.`)) return;
+                  try {
+                    await api.delete(`/servers/${serverId}`);
+                    toast.success('Serveur supprimé');
+                    navigate('/');
+                  } catch (e) {
+                    toast.error(e.response?.data?.error || 'Échec de la suppression');
+                  }
+                }}
+                className="px-4 py-2 bg-red-900/30 hover:bg-red-900/60 border border-red-700 text-red-300 rounded-lg text-sm font-medium transition-all">
+                🗑️ Supprimer ce serveur
+              </button>
+            </div>
           </div>
         )}
       </div>
