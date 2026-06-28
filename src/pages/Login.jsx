@@ -43,7 +43,6 @@ export default function Login() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🎁</div>
           <h1 className="text-2xl font-bold text-white">PremiumKits</h1>
           <p className="text-gray-500 text-sm mt-1">Minecraft Kit Management Panel</p>
         </div>
