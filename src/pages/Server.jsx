@@ -257,6 +257,9 @@ export default function Server() {
 
             <TeamSection serverId={serverId}/>
 
+            {/* Discord Webhook */}
+            <DiscordWebhookSection serverId={serverId}/>
+
             {/* Danger zone */}
             <div className="bg-[#1e1e2e] border border-red-900/50 rounded-xl p-5">
               <h3 className="font-semibold text-red-400 mb-3">⚠️ Zone de danger</h3>
@@ -384,6 +387,49 @@ function TeamSection({ serverId }) {
           Invite
         </button>
       </div>
+    </div>
+  );
+}
+
+// ─── Discord Webhook ──────────────────────────────────────────────────────────
+function DiscordWebhookSection({ serverId }) {
+  const [url, setUrl] = useState('');
+  const [events, setEvents] = useState(['kit_given']);
+  const [saved, setSaved] = useState(false);
+
+  const save = async () => {
+    try {
+      await api.post(`/servers/${serverId}/webhook/discord`, { webhookUrl: url, events });
+      setSaved(true);
+      toast.success('Webhook Discord sauvegardé!');
+      setTimeout(() => setSaved(false), 3000);
+    } catch (e) { toast.error(e.response?.data?.error || 'Échec'); }
+  };
+
+  const toggleEvent = (ev) =>
+    setEvents(prev => prev.includes(ev) ? prev.filter(e=>e!==ev) : [...prev,ev]);
+
+  return (
+    <div className="bg-[#1e1e2e] border border-[#373750] rounded-xl p-5">
+      <h3 className="font-semibold mb-1">🔔 Discord Webhook</h3>
+      <p className="text-xs text-gray-500 mb-3">Reçois des notifications Discord quand des kits sont donnés.</p>
+      <input
+        className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-3 py-2 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-indigo-500 mb-3"
+        placeholder="https://discord.com/api/webhooks/..."
+        value={url} onChange={e=>setUrl(e.target.value)}/>
+      <div className="flex gap-2 flex-wrap mb-3">
+        {['kit_given','server_status'].map(ev=>(
+          <button key={ev}
+            className={`text-xs px-2 py-1 rounded border transition-all ${events.includes(ev)?'bg-indigo-900/40 border-indigo-700 text-indigo-300':'bg-[#2a2a3e] border-[#373750] text-gray-500'}`}
+            onClick={()=>toggleEvent(ev)}>
+            {ev==='kit_given'?'🎁 Kit donné':'🟢 Statut serveur'}
+          </button>
+        ))}
+      </div>
+      <button onClick={save} disabled={!url}
+        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded text-sm font-medium transition-all">
+        {saved?'✅ Sauvegardé':'Sauvegarder'}
+      </button>
     </div>
   );
 }

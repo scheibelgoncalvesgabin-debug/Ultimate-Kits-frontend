@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Save, Trash2, Copy, ToggleLeft, ToggleRight, X, Search, Plus, ChevronDown } from 'lucide-react';
+import { Save, Trash2, Copy, ToggleLeft, ToggleRight, X, Search, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import McItem from '../McItem.jsx';
 import MC_ITEMS from '../../lib/mcItems.js';
+import KitTags from './KitTags.jsx';
 import api from '../../lib/api.js';
 
 // ─── Enchantments list ────────────────────────────────────────────────────────
@@ -366,6 +367,7 @@ export default function KitEditor({ kit, serverId, onClose }) {
   const [conditions, setConditions] = useState(kit?.conditions || {});
   const [actions, setActions] = useState(kit?.actions || {});
   const [priority, setPriority] = useState(kit?.priority || 0);
+  const [tags, setTags] = useState(kit?.tags || {});
 
   const [activeTab, setActiveTab] = useState('items'); // items | access | conditions | actions
   const [itemModal, setItemModal] = useState(null); // {slot, item}
@@ -375,7 +377,7 @@ export default function KitEditor({ kit, serverId, onClose }) {
 
   const saveMutation = useMutation({
     mutationFn: () => api.put(`/servers/${serverId}/kits/${kitId}`, {
-      name, description, enabled, icon, items, access, conditions, actions, priority
+      name, description, enabled, icon, items, access, conditions, actions, priority, tags
     }),
     onSuccess: () => {
       qc.invalidateQueries(['kits', serverId]);
@@ -448,6 +450,7 @@ export default function KitEditor({ kit, serverId, onClose }) {
           {id:'access',label:'🔑 Access'},
           {id:'conditions',label:'⚙️ Conditions'},
           {id:'actions',label:'⚡ Actions'},
+          {id:'tags',label:'🏷️ Tags'},
         ].map(t=>(
           <button key={t.id} onClick={()=>setActiveTab(t.id)}
             className={`px-4 py-2 text-sm font-medium rounded-t transition-all border-b-2 -mb-px ${activeTab===t.id?'border-indigo-500 text-white':'border-transparent text-gray-400 hover:text-white'}`}>
@@ -768,6 +771,13 @@ export default function KitEditor({ kit, serverId, onClose }) {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* ── TAGS TAB ── */}
+        {activeTab === 'tags' && (
+          <div className="max-w-lg">
+            <KitTags tags={tags} onChange={v => { setTags(v); setDirty(true); }}/>
           </div>
         )}
       </div>
