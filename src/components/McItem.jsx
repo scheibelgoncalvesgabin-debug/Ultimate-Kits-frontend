@@ -1,236 +1,131 @@
 import { useState, memo } from 'react';
 
-const ITEM_BASE  = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/item';
-const BLOCK_BASE = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/block';
+const V4   = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.4/assets/minecraft/textures';
+const V5   = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21.5/assets/minecraft/textures';
+const I    = (n, v=V4) => `${v}/item/${n}.png`;
+const B    = (n, v=V4) => `${v}/block/${n}.png`;
 
-const I = (name) => `${ITEM_BASE}/${name}.png`;
-const B = (name) => `${BLOCK_BASE}/${name}.png`;
-
-// Full alias map — item ID -> texture URL
-// Items not listed here use lowercase ID in item/ folder (default)
+// Items whose texture differs from their lowercase material ID
 const ALIASES = {
-  // ── Food (raw names differ) ──────────────────────────────────────────────
-  BEEF:          I('raw_beef'),
-  PORKCHOP:      I('raw_porkchop'),
-  CHICKEN:       I('raw_chicken'),
-  MUTTON:        I('raw_mutton'),
-  COD:           I('raw_cod'),
-  SALMON:        I('raw_salmon'),
-  RABBIT:        I('raw_rabbit'),
+  // Food
+  BEEF:'raw_beef', PORKCHOP:'raw_porkchop', CHICKEN:'raw_chicken',
+  MUTTON:'raw_mutton', COD:'raw_cod', SALMON:'raw_salmon', RABBIT:'raw_rabbit',
+  // Special items
+  GLISTERING_MELON_SLICE:'glistering_melon_slice',
+  EXPERIENCE_BOTTLE:'experience_bottle',
+  FLINT_AND_STEEL:'flint_and_steel', FIRE_CHARGE:'fire_charge',
+  HEART_OF_THE_SEA:'heart_of_the_sea', NAUTILUS_SHELL:'nautilus_shell',
+  NETHER_STAR:'nether_star', TOTEM_OF_UNDYING:'totem_of_undying',
+  BLAZE_ROD:'blaze_rod', GHAST_TEAR:'ghast_tear', DRAGON_BREATH:'dragon_breath',
+  ECHO_SHARD:'echo_shard', DISC_FRAGMENT_5:'disc_fragment_5',
+  FILLED_MAP:'filled_map', HONEYCOMB:'honeycomb', GOAT_HORN:'goat_horn',
+  GOLDEN_CARROT:'golden_carrot',
+};
 
-  // ── Plants/flowers (block textures) ──────────────────────────────────────
-  SHORT_GRASS:          B('short_grass'),
-  GRASS:                B('short_grass'),
-  TALL_GRASS:           B('tall_grass_top'),
-  FERN:                 B('fern'),
-  LARGE_FERN:           B('large_fern_top'),
-  POPPY:                B('poppy'),
-  DANDELION:            B('dandelion'),
-  CORNFLOWER:           B('cornflower'),
-  LILY_OF_THE_VALLEY:   B('lily_of_the_valley'),
-  AZURE_BLUET:          B('azure_bluet'),
-  OXEYE_DAISY:          B('oxeye_daisy'),
-  ALLIUM:               B('allium'),
-  ORANGE_TULIP:         B('orange_tulip'),
-  RED_TULIP:            B('red_tulip'),
-  PINK_TULIP:           B('pink_tulip'),
-  WHITE_TULIP:          B('white_tulip'),
-  SUNFLOWER:            B('sunflower_front'),
-  LILAC:                B('lilac_top'),
-  ROSE_BUSH:            B('rose_bush_top'),
-  PEONY:                B('peony_top'),
-  WITHER_ROSE:          B('wither_rose'),
-  PINK_PETALS:          B('pink_petals'),
-  TORCHFLOWER:          B('torchflower'),
-  PITCHER_PLANT:        B('pitcher_plant_top'),
-  PITCHER_POD:          B('pitcher_crop_bottom'),
-  SPORE_BLOSSOM:        B('spore_blossom'),
-  AZALEA:               B('azalea_top'),
-  AZALEA_LEAVES:        B('azalea_leaves'),
-  HANGING_ROOTS:        B('hanging_roots'),
-  FROGSPAWN:            B('frogspawn'),
-  BIG_DRIPLEAF:         B('big_dripleaf_top'),
-  SMALL_DRIPLEAF:       B('small_dripleaf_top'),
-  LILY_PAD:             B('lily_pad'),
-  SEAGRASS:             B('seagrass'),
-  KELP:                 B('kelp'),
-  DEAD_BUSH:            B('dead_bush'),
-  SWEET_BERRIES:        B('sweet_berry_bush_stage3'),
-  GLOW_BERRIES:         B('cave_vines_plant_lit'),
-  MOSS_CARPET:          B('moss_block'),
-  VINE:                 B('vine'),
-  WEEPING_VINES:        B('weeping_vines_plant'),
-  TWISTING_VINES:       B('twisting_vines_plant'),
+// Items that use block textures (folder + filename)
+const BLOCK_ALIASES = {
+  // Plants / flowers
+  SHORT_GRASS:'short_grass', GRASS:'short_grass', TALL_GRASS:'tall_grass_top',
+  FERN:'fern', LARGE_FERN:'large_fern_top',
+  POPPY:'poppy', DANDELION:'dandelion', CORNFLOWER:'cornflower',
+  LILY_OF_THE_VALLEY:'lily_of_the_valley', AZURE_BLUET:'azure_bluet',
+  OXEYE_DAISY:'oxeye_daisy', ALLIUM:'allium',
+  ORANGE_TULIP:'orange_tulip', RED_TULIP:'red_tulip',
+  PINK_TULIP:'pink_tulip', WHITE_TULIP:'white_tulip',
+  SUNFLOWER:'sunflower_front', LILAC:'lilac_top',
+  ROSE_BUSH:'rose_bush_top', PEONY:'peony_top',
+  WITHER_ROSE:'wither_rose', PINK_PETALS:'pink_petals',
+  TORCHFLOWER:'torchflower', PITCHER_PLANT:'pitcher_plant_top',
+  SPORE_BLOSSOM:'spore_blossom', AZALEA:'azalea_top',
+  AZALEA_LEAVES:'azalea_leaves', HANGING_ROOTS:'hanging_roots',
+  FROGSPAWN:'frogspawn', LILY_PAD:'lily_pad',
+  SEAGRASS:'seagrass', KELP:'kelp', DEAD_BUSH:'dead_bush',
+  SWEET_BERRIES:'sweet_berry_bush_stage3', GLOW_BERRIES:'cave_vines_plant_lit',
+  MOSS_CARPET:'moss_block', VINE:'vine',
+  WEEPING_VINES:'weeping_vines_plant', TWISTING_VINES:'twisting_vines_plant',
+  // Logs
+  OAK_LOG:'oak_log', SPRUCE_LOG:'spruce_log', BIRCH_LOG:'birch_log',
+  JUNGLE_LOG:'jungle_log', ACACIA_LOG:'acacia_log', DARK_OAK_LOG:'dark_oak_log',
+  MANGROVE_LOG:'mangrove_log', CHERRY_LOG:'cherry_log',
+  CRIMSON_STEM:'crimson_stem', WARPED_STEM:'warped_stem',
+  BAMBOO_BLOCK:'bamboo_block_top', STRIPPED_BAMBOO_BLOCK:'stripped_bamboo_block_top',
+  MANGROVE_ROOTS:'mangrove_roots_side',
+  // Leaves
+  OAK_LEAVES:'oak_leaves', SPRUCE_LEAVES:'spruce_leaves',
+  BIRCH_LEAVES:'birch_leaves', JUNGLE_LEAVES:'jungle_leaves',
+  ACACIA_LEAVES:'acacia_leaves', DARK_OAK_LEAVES:'dark_oak_leaves',
+  MANGROVE_LEAVES:'mangrove_leaves', CHERRY_LEAVES:'cherry_leaves',
+  // Stone / terrain
+  STONE:'stone', COBBLESTONE:'cobblestone', GRAVEL:'gravel',
+  SAND:'sand', RED_SAND:'red_sand', DIRT:'dirt', COARSE_DIRT:'coarse_dirt',
+  GRASS_BLOCK:'grass_block_top', PODZOL:'podzol_top', MYCELIUM:'mycelium_top',
+  MUD:'mud', PACKED_MUD:'packed_mud', MUD_BRICKS:'mud_bricks',
+  CALCITE:'calcite', TUFF:'tuff', SMOOTH_BASALT:'smooth_basalt',
+  BASALT:'basalt_top', DEEPSLATE:'deepslate_top',
+  COBBLED_DEEPSLATE:'cobbled_deepslate',
+  REINFORCED_DEEPSLATE:'reinforced_deepslate_top',
+  OBSIDIAN:'obsidian', CRYING_OBSIDIAN:'crying_obsidian',
+  BEDROCK:'bedrock', NETHERRACK:'netherrack',
+  SOUL_SAND:'soul_sand', SOUL_SOIL:'soul_soil', MAGMA_BLOCK:'magma',
+  NETHER_WART_BLOCK:'nether_wart_block', WARPED_WART_BLOCK:'warped_wart_block',
+  CRIMSON_NYLIUM:'crimson_nylium', WARPED_NYLIUM:'warped_nylium',
+  ICE:'ice', PACKED_ICE:'packed_ice', BLUE_ICE:'blue_ice',
+  SNOW_BLOCK:'snow', SNOW:'snow', END_STONE:'end_stone',
+  PURPUR_BLOCK:'purpur_block', PURPUR_PILLAR:'purpur_pillar',
+  // Ores
+  COAL_ORE:'coal_ore', IRON_ORE:'iron_ore', GOLD_ORE:'gold_ore',
+  DIAMOND_ORE:'diamond_ore', EMERALD_ORE:'emerald_ore',
+  LAPIS_ORE:'lapis_ore', REDSTONE_ORE:'redstone_ore',
+  NETHER_GOLD_ORE:'nether_gold_ore', NETHER_QUARTZ_ORE:'nether_quartz_ore',
+  ANCIENT_DEBRIS:'ancient_debris_top',
+  // Mineral blocks
+  COAL_BLOCK:'coal_block', IRON_BLOCK:'iron_block', GOLD_BLOCK:'gold_block',
+  DIAMOND_BLOCK:'diamond_block', EMERALD_BLOCK:'emerald_block',
+  LAPIS_BLOCK:'lapis_block', REDSTONE_BLOCK:'redstone_block',
+  NETHERITE_BLOCK:'netherite_block', AMETHYST_BLOCK:'amethyst_block',
+  BUDDING_AMETHYST:'budding_amethyst',
+  RAW_IRON_BLOCK:'raw_iron_block', RAW_GOLD_BLOCK:'raw_gold_block',
+  RAW_COPPER_BLOCK:'raw_copper_block',
+  // Sculk
+  SCULK:'sculk', SCULK_CATALYST:'sculk_catalyst_top',
+  SCULK_SENSOR:'sculk_sensor_top', SCULK_SHRIEKER:'sculk_shrieker_top',
+  SCULK_VEIN:'sculk_vein',
+  // Lights
+  GLOWSTONE:'glowstone', SEA_LANTERN:'sea_lantern', SHROOMLIGHT:'shroomlight',
+  OCHRE_FROGLIGHT:'ochre_froglight_top',
+  VERDANT_FROGLIGHT:'verdant_froglight_top',
+  PEARLESCENT_FROGLIGHT:'pearlescent_froglight_top',
+  // Buttons (use plank texture)
+  STONE_BUTTON:'stone', OAK_BUTTON:'oak_planks', SPRUCE_BUTTON:'spruce_planks',
+  BIRCH_BUTTON:'birch_planks', JUNGLE_BUTTON:'jungle_planks',
+  ACACIA_BUTTON:'acacia_planks', DARK_OAK_BUTTON:'dark_oak_planks',
+  MANGROVE_BUTTON:'mangrove_planks', CHERRY_BUTTON:'cherry_planks',
+  CRIMSON_BUTTON:'crimson_planks', WARPED_BUTTON:'warped_planks',
+  BAMBOO_BUTTON:'bamboo_planks',
+  POLISHED_BLACKSTONE_BUTTON:'polished_blackstone',
+  // New 1.21 blocks
+  VAULT:'vault_front_off',
+  POINTED_DRIPSTONE:'pointed_dripstone_up_tip',
+  DRIPSTONE_BLOCK:'dripstone_block',
+  ROOTED_DIRT:'rooted_dirt',
+};
 
-  // ── Logs / wood (block textures) ─────────────────────────────────────────
-  OAK_LOG:              B('oak_log'),
-  SPRUCE_LOG:           B('spruce_log'),
-  BIRCH_LOG:            B('birch_log'),
-  JUNGLE_LOG:           B('jungle_log'),
-  ACACIA_LOG:           B('acacia_log'),
-  DARK_OAK_LOG:         B('dark_oak_log'),
-  MANGROVE_LOG:         B('mangrove_log'),
-  CHERRY_LOG:           B('cherry_log'),
-  CRIMSON_STEM:         B('crimson_stem'),
-  WARPED_STEM:          B('warped_stem'),
-  BAMBOO_BLOCK:         B('bamboo_block_top'),
-  STRIPPED_BAMBOO_BLOCK:B('stripped_bamboo_block_top'),
-  MANGROVE_ROOTS:       B('mangrove_roots_side'),
-
-  // ── Leaves ────────────────────────────────────────────────────────────────
-  OAK_LEAVES:           B('oak_leaves'),
-  SPRUCE_LEAVES:        B('spruce_leaves'),
-  BIRCH_LEAVES:         B('birch_leaves'),
-  JUNGLE_LEAVES:        B('jungle_leaves'),
-  ACACIA_LEAVES:        B('acacia_leaves'),
-  DARK_OAK_LEAVES:      B('dark_oak_leaves'),
-  MANGROVE_LEAVES:      B('mangrove_leaves'),
-  CHERRY_LEAVES:        B('cherry_leaves'),
-
-  // ── Stones & terrain (block textures) ────────────────────────────────────
-  STONE:                B('stone'),
-  COBBLESTONE:          B('cobblestone'),
-  GRAVEL:               B('gravel'),
-  SAND:                 B('sand'),
-  RED_SAND:             B('red_sand'),
-  DIRT:                 B('dirt'),
-  COARSE_DIRT:          B('coarse_dirt'),
-  GRASS_BLOCK:          B('grass_block_top'),
-  PODZOL:               B('podzol_top'),
-  MYCELIUM:             B('mycelium_top'),
-  MUD:                  B('mud'),
-  PACKED_MUD:           B('packed_mud'),
-  MUD_BRICKS:           B('mud_bricks'),
-  CALCITE:              B('calcite'),
-  TUFF:                 B('tuff'),
-  SMOOTH_BASALT:        B('smooth_basalt'),
-  BASALT:               B('basalt_top'),
-  DEEPSLATE:            B('deepslate_top'),
-  COBBLED_DEEPSLATE:    B('cobbled_deepslate'),
-  REINFORCED_DEEPSLATE: B('reinforced_deepslate_top'),
-  OBSIDIAN:             B('obsidian'),
-  CRYING_OBSIDIAN:      B('crying_obsidian'),
-  BEDROCK:              B('bedrock'),
-  NETHERRACK:           B('netherrack'),
-  SOUL_SAND:            B('soul_sand'),
-  SOUL_SOIL:            B('soul_soil'),
-  MAGMA_BLOCK:          B('magma'),
-  NETHER_WART_BLOCK:    B('nether_wart_block'),
-  WARPED_WART_BLOCK:    B('warped_wart_block'),
-  CRIMSON_NYLIUM:       B('crimson_nylium'),
-  WARPED_NYLIUM:        B('warped_nylium'),
-  ICE:                  B('ice'),
-  PACKED_ICE:           B('packed_ice'),
-  BLUE_ICE:             B('blue_ice'),
-  SNOW_BLOCK:           B('snow'),
-  SNOW:                 B('snow'),
-  END_STONE:            B('end_stone'),
-  PURPUR_BLOCK:         B('purpur_block'),
-  PURPUR_PILLAR:        B('purpur_pillar'),
-
-  // ── Ores (block textures) ─────────────────────────────────────────────────
-  COAL_ORE:             B('coal_ore'),
-  IRON_ORE:             B('iron_ore'),
-  GOLD_ORE:             B('gold_ore'),
-  DIAMOND_ORE:          B('diamond_ore'),
-  EMERALD_ORE:          B('emerald_ore'),
-  LAPIS_ORE:            B('lapis_ore'),
-  REDSTONE_ORE:         B('redstone_ore'),
-  NETHER_GOLD_ORE:      B('nether_gold_ore'),
-  NETHER_QUARTZ_ORE:    B('nether_quartz_ore'),
-  ANCIENT_DEBRIS:       B('ancient_debris_top'),
-
-  // ── Mineral blocks ────────────────────────────────────────────────────────
-  COAL_BLOCK:           B('coal_block'),
-  IRON_BLOCK:           B('iron_block'),
-  GOLD_BLOCK:           B('gold_block'),
-  DIAMOND_BLOCK:        B('diamond_block'),
-  EMERALD_BLOCK:        B('emerald_block'),
-  LAPIS_BLOCK:          B('lapis_block'),
-  REDSTONE_BLOCK:       B('redstone_block'),
-  NETHERITE_BLOCK:      B('netherite_block'),
-  AMETHYST_BLOCK:       B('amethyst_block'),
-  BUDDING_AMETHYST:     B('budding_amethyst'),
-  RAW_IRON_BLOCK:       B('raw_iron_block'),
-  RAW_GOLD_BLOCK:       B('raw_gold_block'),
-  RAW_COPPER_BLOCK:     B('raw_copper_block'),
-
-  // ── Sculk ─────────────────────────────────────────────────────────────────
-  SCULK:                B('sculk'),
-  SCULK_CATALYST:       B('sculk_catalyst_top'),
-  SCULK_SENSOR:         B('sculk_sensor_top'),
-  SCULK_SHRIEKER:       B('sculk_shrieker_top'),
-  SCULK_VEIN:           B('sculk_vein'),
-
-  // ── Glowstone / lights ────────────────────────────────────────────────────
-  GLOWSTONE:            B('glowstone'),
-  SEA_LANTERN:          B('sea_lantern'),
-  SHROOMLIGHT:          B('shroomlight'),
-  OCHRE_FROGLIGHT:      B('ochre_froglight_top'),
-  VERDANT_FROGLIGHT:    B('verdant_froglight_top'),
-  PEARLESCENT_FROGLIGHT:B('pearlescent_froglight_top'),
-  BEACON:               B('beacon'),
-  CONDUIT:              I('conduit'),
-
-  // ── Buttons / pressure plates (block texture) ────────────────────────────
-  STONE_BUTTON:         B('stone'),
-  OAK_BUTTON:           B('oak_planks'),
-  SPRUCE_BUTTON:        B('spruce_planks'),
-  BIRCH_BUTTON:         B('birch_planks'),
-  JUNGLE_BUTTON:        B('jungle_planks'),
-  ACACIA_BUTTON:        B('acacia_planks'),
-  DARK_OAK_BUTTON:      B('dark_oak_planks'),
-  MANGROVE_BUTTON:      B('mangrove_planks'),
-  CHERRY_BUTTON:        B('cherry_planks'),
-  CRIMSON_BUTTON:       B('crimson_planks'),
-  WARPED_BUTTON:        B('warped_planks'),
-  BAMBOO_BUTTON:        B('bamboo_planks'),
-  POLISHED_BLACKSTONE_BUTTON: B('polished_blackstone'),
-
-  // ── 1.21 new items ────────────────────────────────────────────────────────
-  VAULT:                B('vault_front_off'),
-  HEAVY_CORE:           B('heavy_core'),
-  WIND_CHARGE:          I('wind_charge'),
-  BREEZE_ROD:           I('breeze_rod'),
-  MACE:                 I('mace'),
-  TRIAL_KEY:            I('trial_key'),
-  OMINOUS_TRIAL_KEY:    I('ominous_trial_key'),
-  OMINOUS_BOTTLE:       I('ominous_bottle'),
-  ARMADILLO_SCUTE:      I('armadillo_scute'),
-  WOLF_ARMOR:           I('wolf_armor'),
-
-  // ── Misc items with different names ──────────────────────────────────────
-  GLISTERING_MELON_SLICE: I('glistering_melon_slice'),
-  MELON_SLICE:          I('melon_slice'),
-  EXPERIENCE_BOTTLE:    I('experience_bottle'),
-  GOLDEN_CARROT:        I('golden_carrot'),
-  NETHER_STAR:          I('nether_star'),
-  TOTEM_OF_UNDYING:     I('totem_of_undying'),
-  BLAZE_ROD:            I('blaze_rod'),
-  GHAST_TEAR:           I('ghast_tear'),
-  DRAGON_BREATH:        I('dragon_breath'),
-  ECHO_SHARD:           I('echo_shard'),
-  FLINT_AND_STEEL:      I('flint_and_steel'),
-  FIRE_CHARGE:          I('fire_charge'),
-  HEART_OF_THE_SEA:     I('heart_of_the_sea'),
-  NAUTILUS_SHELL:       I('nautilus_shell'),
-  HONEYCOMB:            I('honeycomb'),
-  GOAT_HORN:            I('goat_horn'),
-  DISC_FRAGMENT_5:      I('disc_fragment_5'),
-  FILLED_MAP:           I('filled_map'),
-
-  // ── Pointed dripstone etc ─────────────────────────────────────────────────
-  POINTED_DRIPSTONE:    B('pointed_dripstone_up_tip'),
-  DRIPSTONE_BLOCK:      B('dripstone_block'),
-  ROOTED_DIRT:          B('rooted_dirt'),
+// Items that need a different version branch
+const VERSION_OVERRIDES = {
+  HEAVY_CORE: B('heavy_core', V5),
 };
 
 export function getTextureUrl(materialId) {
   if (!materialId) return null;
   const id = materialId.toUpperCase();
-  if (ALIASES[id]) return ALIASES[id];
-  // Default: item folder with lowercase name
-  return `${ITEM_BASE}/${id.toLowerCase()}.png`;
+  // Version override
+  if (VERSION_OVERRIDES[id]) return VERSION_OVERRIDES[id];
+  // Block texture alias
+  if (BLOCK_ALIASES[id]) return B(BLOCK_ALIASES[id]);
+  // Item alias
+  if (ALIASES[id]) return I(ALIASES[id]);
+  // Default: item folder
+  return I(id.toLowerCase());
 }
 
 const McItem = memo(function McItem({ materialId, size = 32, className = '', style = {}, title }) {

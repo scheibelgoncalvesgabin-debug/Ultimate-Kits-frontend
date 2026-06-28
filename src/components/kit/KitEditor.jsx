@@ -565,18 +565,50 @@ export default function KitEditor({ kit, serverId, onClose }) {
 
             {access.type === 'GROUP' && (
               <div>
-                <label className="text-xs text-gray-400 block mb-1">LuckPerms Group Name</label>
-                <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-3 py-2 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-                  placeholder="vip, mvp, admin..."
-                  value={access.group||''} onChange={e=>setAcc('group',e.target.value)}/>
+                <label className="text-xs text-gray-400 block mb-1">Groupes LuckPerms requis</label>
+                <p className="text-[10px] text-gray-600 mb-2">Le joueur doit être dans <span className="text-yellow-400">AU MOINS UN</span> de ces groupes.</p>
+                <div className="space-y-1.5 mb-2">
+                  {(access.groups||[access.group].filter(Boolean)).map((g,i)=>(
+                    <div key={i} className="flex gap-2 items-center">
+                      <input className="flex-1 bg-[#2a2a3e] border border-[#373750] rounded px-3 py-1.5 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                        placeholder="vip, mvp, admin..."
+                        value={g}
+                        onChange={e=>{const a=[...(access.groups||[access.group].filter(Boolean))];a[i]=e.target.value;setAcc('groups',a);setAcc('group',a[0]||'')}}/>
+                      {(access.groups||[access.group].filter(Boolean)).length > 1 && (
+                        <button className="text-red-400 hover:text-red-300 text-sm px-1"
+                          onClick={()=>{const a=(access.groups||[]).filter((_,j)=>j!==i);setAcc('groups',a);setAcc('group',a[0]||'')}}>×</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button className="text-xs px-2 py-1 bg-indigo-900/30 hover:bg-indigo-900/50 border border-indigo-800 text-indigo-300 rounded transition-all"
+                  onClick={()=>setAcc('groups',[...(access.groups||[access.group].filter(Boolean)),'' ])}>
+                  + Ajouter un groupe
+                </button>
               </div>
             )}
             {access.type === 'PERMISSION' && (
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Permission Node</label>
-                <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-3 py-2 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-                  placeholder="premiumkits.kit.vip"
-                  value={access.permission||''} onChange={e=>setAcc('permission',e.target.value)}/>
+                <label className="text-xs text-gray-400 block mb-1">Permissions requises</label>
+                <p className="text-[10px] text-gray-600 mb-2">Le joueur doit avoir <span className="text-yellow-400">TOUTES</span> ces permissions.</p>
+                <div className="space-y-1.5 mb-2">
+                  {(access.permissions||[access.permission].filter(Boolean)).map((p,i)=>(
+                    <div key={i} className="flex gap-2 items-center">
+                      <input className="flex-1 bg-[#2a2a3e] border border-[#373750] rounded px-3 py-1.5 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                        placeholder="premiumkits.kit.vip"
+                        value={p}
+                        onChange={e=>{const a=[...(access.permissions||[access.permission].filter(Boolean))];a[i]=e.target.value;setAcc('permissions',a);setAcc('permission',a[0]||'')}}/>
+                      {(access.permissions||[access.permission].filter(Boolean)).length > 1 && (
+                        <button className="text-red-400 hover:text-red-300 text-sm px-1"
+                          onClick={()=>{const a=(access.permissions||[]).filter((_,j)=>j!==i);setAcc('permissions',a);setAcc('permission',a[0]||'')}}>×</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button className="text-xs px-2 py-1 bg-indigo-900/30 hover:bg-indigo-900/50 border border-indigo-800 text-indigo-300 rounded transition-all"
+                  onClick={()=>setAcc('permissions',[...(access.permissions||[access.permission].filter(Boolean)),'' ])}>
+                  + Ajouter une permission
+                </button>
               </div>
             )}
             {access.type === 'PLAYER' && (
@@ -658,34 +690,49 @@ export default function KitEditor({ kit, serverId, onClose }) {
                 </div>
               ))}
             </div>
-            {/* Placeholder check */}
+            {/* Multi-Placeholder checks */}
             <div className="bg-[#1a1a2e] border border-[#2a2a3e] rounded-lg p-3 space-y-2">
-              <label className="text-xs text-blue-400 font-medium block">🔍 PlaceholderAPI Verification</label>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-3 sm:col-span-1">
-                  <label className="text-[10px] text-gray-500 block mb-1">Placeholder</label>
-                  <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white font-mono placeholder-gray-600 focus:outline-none focus:border-blue-500"
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-blue-400 font-medium">🔍 PlaceholderAPI — Vérifications multiples</label>
+                <button
+                  className="text-xs px-2 py-1 bg-blue-900/30 hover:bg-blue-900/50 border border-blue-800 text-blue-300 rounded transition-all"
+                  onClick={()=>setCond('placeholderChecks',[...(conditions.placeholderChecks||[]),{placeholder:'',operator:'>=',value:'',logic:'AND'}])}>
+                  + Ajouter
+                </button>
+              </div>
+              {(conditions.placeholderChecks||[]).length === 0 && (
+                <p className="text-[10px] text-gray-600">Aucune vérification. Clique sur Ajouter pour en créer une.</p>
+              )}
+              {(conditions.placeholderChecks||[]).map((pc,i)=>(
+                <div key={i} className="flex gap-1.5 items-center">
+                  {i > 0 && (
+                    <select className="bg-[#2a2a3e] border border-[#373750] rounded px-1 py-1 text-[10px] text-yellow-300 focus:outline-none w-12"
+                      value={pc.logic||'AND'}
+                      onChange={e=>{const a=[...(conditions.placeholderChecks||[])];a[i]={...a[i],logic:e.target.value};setCond('placeholderChecks',a)}}>
+                      <option value="AND">ET</option>
+                      <option value="OR">OU</option>
+                    </select>
+                  )}
+                  <input className="flex-1 bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1 text-xs text-white font-mono placeholder-gray-600 focus:outline-none focus:border-blue-500"
                     placeholder="%vault_balance%"
-                    value={conditions.placeholderCheck?.placeholder||''}
-                    onChange={e=>setCond('placeholderCheck',{...conditions.placeholderCheck,placeholder:e.target.value})}/>
-                </div>
-                <div>
-                  <label className="text-[10px] text-gray-500 block mb-1">Operator</label>
-                  <select className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-1 py-1.5 text-xs text-white focus:outline-none"
-                    value={conditions.placeholderCheck?.operator||'>='}
-                    onChange={e=>setCond('placeholderCheck',{...conditions.placeholderCheck,operator:e.target.value})}>
+                    value={pc.placeholder||''}
+                    onChange={e=>{const a=[...(conditions.placeholderChecks||[])];a[i]={...a[i],placeholder:e.target.value};setCond('placeholderChecks',a)}}/>
+                  <select className="bg-[#2a2a3e] border border-[#373750] rounded px-1 py-1 text-xs text-white focus:outline-none w-12"
+                    value={pc.operator||'>='}
+                    onChange={e=>{const a=[...(conditions.placeholderChecks||[])];a[i]={...a[i],operator:e.target.value};setCond('placeholderChecks',a)}}>
                     {['>=','<=','>','<','==','!='].map(op=><option key={op} value={op}>{op}</option>)}
                   </select>
-                </div>
-                <div>
-                  <label className="text-[10px] text-gray-500 block mb-1">Value</label>
-                  <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
+                  <input className="w-20 bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-blue-500"
                     placeholder="1000"
-                    value={conditions.placeholderCheck?.value||''}
-                    onChange={e=>setCond('placeholderCheck',{...conditions.placeholderCheck,value:e.target.value})}/>
+                    value={pc.value||''}
+                    onChange={e=>{const a=[...(conditions.placeholderChecks||[])];a[i]={...a[i],value:e.target.value};setCond('placeholderChecks',a)}}/>
+                  <button className="text-red-400 hover:text-red-300 text-sm px-1"
+                    onClick={()=>setCond('placeholderChecks',(conditions.placeholderChecks||[]).filter((_,j)=>j!==i))}>×</button>
                 </div>
-              </div>
-              <p className="text-[10px] text-gray-600">Ex: %vault_balance% ≥ 1000 → player needs $1000 to receive</p>
+              ))}
+              {(conditions.placeholderChecks||[]).length > 0 && (
+                <p className="text-[10px] text-gray-600">Les conditions ET/OU sont évaluées de haut en bas.</p>
+              )}
             </div>
           </div>
         )}
