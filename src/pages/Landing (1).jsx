@@ -6,7 +6,7 @@ const FEATURES = [
   { icon: <Shield className="w-6 h-6"/>, title: 'Accès avancé', desc: 'Filtre par groupe LuckPerms, permission spécifique, joueur UUID ou monde.' },
   { icon: <Zap className="w-6 h-6"/>, title: 'Actions puissantes', desc: 'Son, particule, broadcast, commande console et message custom à la réception.' },
   { icon: <Users className="w-6 h-6"/>, title: 'Multi-admin', desc: 'Invite des co-gérants avec des rôles différents (admin, éditeur, viewer).' },
-  { icon: <BarChart2className="w-6 h-6"/>, title: 'Statistiques', desc: 'Suis les kits donnés par joueur, par jour, exporte en CSV.' },
+  { icon: <BarChart2 className="w-6 h-6"/>, title: 'Statistiques', desc: 'Suis les kits donnés par joueur, par jour, exporte en CSV.' },
   { icon: <Shield className="w-6 h-6"/>, title: 'Placeholder check', desc: 'Vérifie n\'importe quelle valeur PAPI avant de donner un kit (%vault_balance% ≥ 1000).' },
 ];
 
