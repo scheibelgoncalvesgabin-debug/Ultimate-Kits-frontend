@@ -78,6 +78,10 @@ function ItemModal({ slot, item, onSave, onDelete, onClose }) {
   const [customModelData, setCustomModelData] = useState(item?.meta?.customModelData || '');
   const [enchants, setEnchants] = useState(item?.meta?.enchants || []);
   const [enchSearch, setEnchSearch] = useState('');
+  // External plugin items
+  const [mythicId, setMythicId] = useState(item?.meta?.mythicId || '');
+  const [itemsAdderId, setItemsAdderId] = useState(item?.meta?.itemsAdderId || '');
+  const [oraxenId, setOraxenId] = useState(item?.meta?.oraxenId || '');
   // Potion
   const [potionEffect, setPotionEffect] = useState(item?.meta?.potionEffect || '');
   const [potionAmplifier, setPotionAmplifier] = useState(item?.meta?.potionAmplifier || 0);
@@ -95,6 +99,9 @@ function ItemModal({ slot, item, onSave, onDelete, onClose }) {
     if (enchantGlow) meta.enchantGlow = true;
     if (customModelData) meta.customModelData = parseInt(customModelData);
     if (enchants.length) meta.enchants = enchants;
+    if (mythicId) meta.mythicId = mythicId;
+    if (itemsAdderId) meta.itemsAdderId = itemsAdderId;
+    if (oraxenId) meta.oraxenId = oraxenId;
     if (isPotion && potionEffect) {
       meta.potionEffect = potionEffect;
       meta.potionAmplifier = potionAmplifier;
@@ -194,6 +201,26 @@ function ItemModal({ slot, item, onSave, onDelete, onClose }) {
                     onClick={()=>setEnchantGlow(!enchantGlow)}>
                     <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${enchantGlow?'left-5':'left-0.5'}`}/>
                   </button>
+                </div>
+
+                {/* External item plugins */}
+                <div className="pt-2 border-t border-[#373750] space-y-2">
+                  <p className="text-xs text-gray-500">External item plugins — fill only one. If set, it overrides the vanilla item above.</p>
+                  <div>
+                    <label className="text-[10px] text-gray-500 block mb-1">🐉 MythicMobs item ID</label>
+                    <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white font-mono placeholder-gray-600 focus:outline-none focus:border-pink-500"
+                      placeholder="ExcaliburSword" value={mythicId} onChange={e=>setMythicId(e.target.value)}/>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-500 block mb-1">🧩 ItemsAdder item ID</label>
+                    <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white font-mono placeholder-gray-600 focus:outline-none focus:border-green-500"
+                      placeholder="namespace:item_id" value={itemsAdderId} onChange={e=>setItemsAdderId(e.target.value)}/>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-gray-500 block mb-1">🍂 Oraxen item ID</label>
+                    <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white font-mono placeholder-gray-600 focus:outline-none focus:border-yellow-500"
+                      placeholder="oraxen_item_id" value={oraxenId} onChange={e=>setOraxenId(e.target.value)}/>
+                  </div>
                 </div>
               </div>
             )}
