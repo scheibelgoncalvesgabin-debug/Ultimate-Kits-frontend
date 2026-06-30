@@ -1,0 +1,103 @@
+// Pre-made kit templates — quick start for common kit types
+const KIT_TEMPLATES = [
+  {
+    id: 'starter',
+    name: 'Kit Starter',
+    icon: 'WOODEN_SWORD',
+    description: 'Kit de base pour les nouveaux joueurs',
+    items: {
+      0: { type: 'WOODEN_SWORD', amount: 1 },
+      1: { type: 'STONE_PICKAXE', amount: 1 },
+      2: { type: 'STONE_AXE', amount: 1 },
+      3: { type: 'BREAD', amount: 16 },
+      8: { type: 'TORCH', amount: 32 },
+    },
+    access: { type: 'EVERYONE' },
+    conditions: { oneTime: true },
+    actions: { customMessage: '&aBienvenue ! Voici ton kit de départ.' },
+  },
+  {
+    id: 'pvp',
+    name: 'Kit PvP',
+    icon: 'DIAMOND_SWORD',
+    description: 'Équipement complet pour le combat',
+    items: {
+      0: { type: 'DIAMOND_SWORD', amount: 1, meta: { enchants: [{id:'sharpness',level:5}] } },
+      1: { type: 'BOW', amount: 1, meta: { enchants: [{id:'power',level:3}] } },
+      2: { type: 'ARROW', amount: 64 },
+      36: { type: 'DIAMOND_BOOTS', amount: 1 },
+      37: { type: 'DIAMOND_LEGGINGS', amount: 1 },
+      38: { type: 'DIAMOND_CHESTPLATE', amount: 1 },
+      39: { type: 'DIAMOND_HELMET', amount: 1 },
+      40: { type: 'SHIELD', amount: 1 },
+    },
+    access: { type: 'GROUP', group: 'vip', groups: ['vip'], groupLogic: 'OR' },
+    conditions: { cooldownSeconds: 3600 },
+    actions: { sound: 'ENTITY_PLAYER_LEVELUP', soundVolume: 1, soundPitch: 1.2 },
+  },
+  {
+    id: 'builder',
+    name: 'Kit Builder',
+    icon: 'BRICKS',
+    description: 'Blocs et outils pour la construction',
+    items: {
+      0: { type: 'DIAMOND_PICKAXE', amount: 1, meta: { enchants: [{id:'efficiency',level:4}] } },
+      1: { type: 'BRICKS', amount: 64 },
+      2: { type: 'STONE', amount: 64 },
+      3: { type: 'GLASS', amount: 64 },
+      4: { type: 'OAK_PLANKS', amount: 64 },
+    },
+    access: { type: 'PERMISSION', permission: 'premiumkits.builder', permissions: ['premiumkits.builder'], permLogic: 'AND' },
+    conditions: {},
+    actions: {},
+  },
+  {
+    id: 'vip',
+    name: 'Kit VIP',
+    icon: 'GOLDEN_APPLE',
+    description: 'Avantages exclusifs VIP',
+    items: {
+      0: { type: 'GOLDEN_APPLE', amount: 8 },
+      1: { type: 'ENDER_PEARL', amount: 16 },
+      2: { type: 'EXPERIENCE_BOTTLE', amount: 32 },
+    },
+    access: { type: 'GROUP', group: 'vip', groups: ['vip'], groupLogic: 'OR' },
+    conditions: { cooldownSeconds: 86400 },
+    actions: {
+      broadcast: '&6{player} &7a reçu le &eKit VIP&7 !',
+      sound: 'ENTITY_FIREWORK_ROCKET_BLAST',
+    },
+  },
+  {
+    id: 'daily',
+    name: 'Kit Quotidien',
+    icon: 'CLOCK',
+    description: 'Récompense journalière pour tous',
+    items: {
+      0: { type: 'IRON_INGOT', amount: 8 },
+      1: { type: 'BREAD', amount: 8 },
+      2: { type: 'EXPERIENCE_BOTTLE', amount: 5 },
+    },
+    access: { type: 'EVERYONE' },
+    conditions: { cooldownSeconds: 86400 },
+    actions: { customMessage: '&aTon kit quotidien est arrivé !' },
+  },
+  {
+    id: 'event',
+    name: 'Kit Événement',
+    icon: 'FIREWORK_ROCKET',
+    description: 'Template pour événement limité dans le temps',
+    items: {
+      0: { type: 'NETHER_STAR', amount: 1, meta: { displayName: '&d&lÉtoile Événement' } },
+    },
+    access: { type: 'EVERYONE' },
+    conditions: { oneTime: true, eventStart: 0, eventEnd: 0 },
+    actions: {
+      broadcast: '&d{player} &7a reçu le kit événement !',
+      particle: 'FIREWORKS_SPARK',
+      particleCount: 40,
+    },
+  },
+];
+
+export default KIT_TEMPLATES;

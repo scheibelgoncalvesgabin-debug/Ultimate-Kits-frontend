@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Server, Wifi, WifiOff, Package, BarChart2 } from 'lucide-react';
+import { Plus, Server, Wifi, WifiOff, Package, BarChart2, Sun, Moon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../lib/api.js';
+import { useTheme } from '../hooks/useTheme.js';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { theme, toggle } = useTheme();
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
@@ -40,6 +42,11 @@ export default function Dashboard() {
             <p className="text-gray-400 text-sm mt-0.5">Manage your Minecraft kit servers</p>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={toggle}
+              className="p-2 bg-[#1e1e2e] hover:bg-[#2a2a3e] border border-[#373750] rounded-lg text-gray-400 hover:text-white transition-all"
+              title={theme==='dark'?'Mode clair':'Mode sombre'}>
+              {theme==='dark' ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}
+            </button>
             <button onClick={() => setShowCreate(true)}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-all">
               <Plus className="w-4 h-4"/> Add Server

@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import McItem from '../McItem.jsx';
 import MC_ITEMS from '../../lib/mcItems.js';
 import KitTags from './KitTags.jsx';
+import AccessSimulator from './AccessSimulator.jsx';
 import api from '../../lib/api.js';
 
 // ─── Enchantments list ────────────────────────────────────────────────────────
@@ -565,8 +566,19 @@ export default function KitEditor({ kit, serverId, onClose }) {
 
             {access.type === 'GROUP' && (
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Groupes LuckPerms requis</label>
-                <p className="text-[10px] text-gray-600 mb-2">Le joueur doit être dans <span className="text-yellow-400">AU MOINS UN</span> de ces groupes.</p>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-400">Groupes LuckPerms requis</label>
+                  <select className="bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1 text-xs text-yellow-300 focus:outline-none"
+                    value={access.groupLogic||'OR'} onChange={e=>setAcc('groupLogic',e.target.value)}>
+                    <option value="OR">UN PARMI (OU)</option>
+                    <option value="AND">TOUS (ET)</option>
+                  </select>
+                </div>
+                <p className="text-[10px] text-gray-600 mb-2">
+                  {access.groupLogic==='AND'
+                    ? 'Le joueur doit être dans TOUS ces groupes.'
+                    : 'Le joueur doit être dans AU MOINS UN de ces groupes.'}
+                </p>
                 <div className="space-y-1.5 mb-2">
                   {(access.groups||[access.group].filter(Boolean)).map((g,i)=>(
                     <div key={i} className="flex gap-2 items-center">
@@ -589,8 +601,19 @@ export default function KitEditor({ kit, serverId, onClose }) {
             )}
             {access.type === 'PERMISSION' && (
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Permissions requises</label>
-                <p className="text-[10px] text-gray-600 mb-2">Le joueur doit avoir <span className="text-yellow-400">TOUTES</span> ces permissions.</p>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-gray-400">Permissions requises</label>
+                  <select className="bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1 text-xs text-yellow-300 focus:outline-none"
+                    value={access.permLogic||'AND'} onChange={e=>setAcc('permLogic',e.target.value)}>
+                    <option value="AND">TOUTES (ET)</option>
+                    <option value="OR">UNE PARMI (OU)</option>
+                  </select>
+                </div>
+                <p className="text-[10px] text-gray-600 mb-2">
+                  {access.permLogic==='OR'
+                    ? 'Le joueur doit avoir AU MOINS UNE de ces permissions.'
+                    : 'Le joueur doit avoir TOUTES ces permissions.'}
+                </p>
                 <div className="space-y-1.5 mb-2">
                   {(access.permissions||[access.permission].filter(Boolean)).map((p,i)=>(
                     <div key={i} className="flex gap-2 items-center">
@@ -634,6 +657,8 @@ export default function KitEditor({ kit, serverId, onClose }) {
                 value={priority} onChange={e=>{setPriority(+e.target.value);setDirty(true);}}/>
               <p className="text-xs text-gray-600 mt-0.5">PLAYER=100, GROUP=50, EVERYONE=0 (default)</p>
             </div>
+
+            <AccessSimulator kit={{access, conditions}}/>
           </div>
         )}
 
@@ -674,6 +699,28 @@ export default function KitEditor({ kit, serverId, onClose }) {
               <input className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-3 py-2 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-indigo-500"
                 placeholder="spawn_zone"
                 value={conditions.worldGuardRegion||''} onChange={e=>setCond('worldGuardRegion',e.target.value)}/>
+            </div>
+
+            {/* Event window */}
+            <div className="bg-[#1a1a2e] border border-[#2a2a3e] rounded-lg p-3">
+              <label className="text-xs text-pink-400 font-medium block mb-2">🎉 Kit événementiel (optionnel)</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">Début</label>
+                  <input type="datetime-local"
+                    className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-pink-500"
+                    value={conditions.eventStart ? new Date(conditions.eventStart).toISOString().slice(0,16) : ''}
+                    onChange={e=>setCond('eventStart', e.target.value ? new Date(e.target.value).getTime() : 0)}/>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 block mb-1">Fin</label>
+                  <input type="datetime-local"
+                    className="w-full bg-[#2a2a3e] border border-[#373750] rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-pink-500"
+                    value={conditions.eventEnd ? new Date(conditions.eventEnd).toISOString().slice(0,16) : ''}
+                    onChange={e=>setCond('eventEnd', e.target.value ? new Date(e.target.value).getTime() : 0)}/>
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-600 mt-1">Laisser vide = pas de restriction de date. Le kit n'est disponible qu'entre ces deux dates.</p>
             </div>
             {/* Toggles */}
             <div className="space-y-2 pt-2 border-t border-[#2a2a3e]">

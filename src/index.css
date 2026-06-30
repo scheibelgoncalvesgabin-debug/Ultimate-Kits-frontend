@@ -26,3 +26,22 @@
     @apply btn bg-[#2a2a3e] hover:bg-[#353550] border border-[#373750] text-gray-300;
   }
 }
+
+/* Light theme overrides — simple CSS variable swap */
+:root[data-theme="light"] {
+  --bg-base: #f4f4f8;
+  --bg-card: #ffffff;
+  --bg-input: #f0f0f5;
+  --border: #e0e0ea;
+  --text: #1a1a2e;
+}
+:root[data-theme="light"] body { background: var(--bg-base); color: var(--text); }
+:root[data-theme="light"] .bg-\[\#0d0d1a\] { background-color: var(--bg-base) !important; }
+:root[data-theme="light"] .bg-\[\#1e1e2e\] { background-color: var(--bg-card) !important; }
+:root[data-theme="light"] .bg-\[\#2a2a3e\] { background-color: var(--bg-input) !important; }
+:root[data-theme="light"] .bg-\[\#1a1a2e\] { background-color: var(--bg-input) !important; }
+:root[data-theme="light"] .border-\[\#373750\] { border-color: var(--border) !important; }
+:root[data-theme="light"] .border-\[\#2a2a3e\] { border-color: var(--border) !important; }
+:root[data-theme="light"] .text-white { color: var(--text) !important; }
+:root[data-theme="light"] .text-gray-300 { color: #3a3a4a !important; }
+:root[data-theme="light"] .text-gray-400 { color: #6a6a7a !important; }
